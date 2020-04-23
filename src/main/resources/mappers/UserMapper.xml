@@ -163,10 +163,11 @@
     where email = #{email}
   </select>
 
-
+  <!--需要返回User对象, 上面定义，resultMap id="BaseResultMap" type="com.mmall.pojo.User" -->
+  <!--parameterType="map"中map代表java.util.Map， parameterMap是sql中申明的resultMap类对象-->
   <select id="selectLogin" resultMap="BaseResultMap" parameterType="map">
     SELECT
---     *???//这样真的好么?答案就是,这样不好.
+--     *???//请不要select *
     <include refid="Base_Column_List" />
     from mmall_user
     where username = #{username}
@@ -198,7 +199,7 @@
 
   <select id="checkPassword" resultType="int" parameterType="map">
     SELECT
-    count(1)
+    count(1) // count(1) performance is better than count(*)
     from mmall_user
     where password = #{password}
     and id = #{userId}
