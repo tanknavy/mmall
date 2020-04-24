@@ -1,16 +1,26 @@
 package com.mmall.pojo;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 public class User {
     private Integer id;
-
+    @NotNull(message = "required")
     private String username;
 
+    @NotNull(message = "required")
+    @Pattern(regexp="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,10}$", message="at least one digit/uppercase, length >6")
     private String password;
 
+    //@NotNull(message = "required")
+    //@Pattern(regexp="^[0-9A-Za-z._-]+@[0-9A-Za-z]+\\.[A-Za-z]+", message="*xx@xx.xx* email format")
+    @Email
     private String email;
 
+    @Min(10)
     private String phone;
 
     private String question;

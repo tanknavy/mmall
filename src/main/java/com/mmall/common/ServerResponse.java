@@ -1,5 +1,6 @@
 package com.mmall.common;
 
+import com.mmall.pojo.User;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 

@@ -17,6 +17,7 @@ public class TokenCache {
     private static Logger logger = LoggerFactory.getLogger(TokenCache.class); //日志打开
     //private static Logger logger = LoggerFactory.getLogger(getClass()); //getClass是动态的，静态不能引用动态
 
+    public static final String TOKEN_PREFIX = "token_";
     // guava初始化缓存,LRU算法
     private static LoadingCache<String, String> localCache = CacheBuilder.newBuilder()
             .initialCapacity(1000).maximumSize(10000).expireAfterAccess(12, TimeUnit.HOURS) //12小时有效期

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service("iUserService") //注解
 public class UserServiceImpl implements IUserService {
@@ -49,7 +50,6 @@ public class UserServiceImpl implements IUserService {
         if (resultCount > 0 ){
             return ServerResponse.createByErrorMessage("User already registered!");
         }
-
         resultCount = userMapper.checkEmail(user.getEmail());
         if (resultCount > 0 ){
             return ServerResponse.createByErrorMessage("Email already exist!");
@@ -178,7 +178,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<User> updateInformation(User user){
-       //username 不能更新，并且email也要校验，不能存在，如果存在不能是当前用户，这里容许一个多个用户名公用一个email
+        //username 不能更新，并且email也要校验，不能存在，如果存在不能是当前用户，这里容许一个多个用户名公用一个email
         int resultCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
         if(resultCount >0 ){
             return ServerResponse.createByErrorMessage("email exist, please change and try again");
@@ -208,6 +208,22 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccess(user);
     }
 
+    // password compliance check
+    public Boolean checkPassword(String password){
+        final String PASSWORD_REGEX = Const.PASSWORD_RULE;
+        final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
 
+        return PASSWORD_PATTERN.matcher(password).matches();
+
+    }
+
+    // backend
+    @Override
+    public ServerResponse checkAdminRole(User user){
+        if(user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
 
 }
