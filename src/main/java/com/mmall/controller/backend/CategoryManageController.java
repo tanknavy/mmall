@@ -47,6 +47,8 @@ public class CategoryManageController {
         }
     }
 
+    @RequestMapping("/set_category_name.do")
+    @ResponseBody
     public ServerResponse setCategoryName(HttpSession session,Integer categoryId, String categoryName){
         User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
         if(user == null){
@@ -61,5 +63,39 @@ public class CategoryManageController {
         }
     }
 
+    // 获取子节点平级信息，不递归
+    @RequestMapping("/get_category.do")
+    @ResponseBody
+    public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
+        User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
+        if(user == null){
+            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+        }
+        if(userService.checkAdminRole(user).isSuccess()){
+            //admin role, can maintain category
+            // 查询子节点信息，不递归
+            return categoryService.getChildrenParallelCategory(categoryId);
 
+        }else{
+            return ServerResponse.createByErrorMessage("need admin role");
+        }
+    }
+
+    // 获取子节点平级信息，递归
+    @RequestMapping("/get_deep_category.do")
+    @ResponseBody
+    public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
+        User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
+        if(user == null){
+            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+        }
+        if(userService.checkAdminRole(user).isSuccess()){
+            //admin role, can maintain category
+            // 查询子节点信息，递归 0->10->100
+            return categoryService.selectCategoryAndChildrenById(categoryId);
+
+        }else{
+            return ServerResponse.createByErrorMessage("need admin role");
+        }
+    }
 }

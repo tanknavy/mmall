@@ -117,6 +117,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <!--return Lis<Category>, myBatis just need the record's type,-->
   <select id="selectCategoryChildrenByParentId" resultMap="BaseResultMap" parameterType="int">
     select
     <include refid="Base_Column_List"/>
