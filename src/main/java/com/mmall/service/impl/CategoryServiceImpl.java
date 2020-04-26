@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -76,9 +75,9 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     // sub-category and deep query
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId){
+    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId){
         //Set<Category> totalCategorySet = new HashSet<>();
-        Set<Category> totalCategorySet = Sets.newHashSet(); //guawa
+        Set<Category> totalCategorySet = Sets.newHashSet(); //google的guava
         findChildCategory(totalCategorySet, categoryId);
 
         List<Integer> categoryIdList = Lists.newArrayList();
@@ -98,7 +97,7 @@ public class CategoryServiceImpl implements ICategoryService {
         if(category != null) {
             totalCategorySet.add(category); //只要有子节点就会被加入
             //return totalCategory
-        } // else will not start cause the below loop will not start dur to empty category
+        } else { return totalCategorySet;} // 这里不需要判断退出(到达不了)，因为为空下面的loop不会执行了然后return
         // sql: category.parentId in parentCategorySet
         //totalCategorySet.add(categoryMapper.selectByPrimaryKey(categoryId));
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
@@ -106,7 +105,8 @@ public class CategoryServiceImpl implements ICategoryService {
         for (Category categoryItem : categoryList) {
             findChildCategory(totalCategorySet, categoryItem.getId());
         }
-        return totalCategorySet;
+        return totalCategorySet; //初识根最后返回总计，子孙节点先完成
     }
+
 
 }

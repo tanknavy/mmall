@@ -124,10 +124,12 @@ public class UserController {
     }
 
     //获取用户详细信息
+    @RequestMapping(value = "get_information.do",method = RequestMethod.POST)
+    @ResponseBody
     public ServerResponse<User> get_information(HttpSession session){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER); //从Object对象Cast到User
         if (currentUser == null){
-            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "Need to login");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "Need to login");
         }
         return iUserService.getInformation(currentUser.getId());
     }

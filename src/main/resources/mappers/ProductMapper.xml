@@ -177,7 +177,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-
+  <!--no input parameter, no ; at end, cause mybatis pageHelper may add parameter-->
   <select id="selectList" resultMap="BaseResultMap" >
     SELECT
     <include refid="Base_Column_List"/>
@@ -185,7 +185,7 @@
     ORDER BY id asc
   </select>
 
-
+  <!-- mybatis tag avoid the where 1=1, where will replace the first and-->
   <select id="selectByNameAndProductId" resultMap="BaseResultMap" parameterType="map">
     SELECT
     <include refid="Base_Column_List"/>
@@ -199,7 +199,8 @@
       </if>
     </where>
   </select>
-  
+
+  <!-- where category_id in collection -->
   <select id="selectByNameAndCategoryIds" resultMap="BaseResultMap" parameterType="map">
     SELECT
     <include refid="Base_Column_List"></include>

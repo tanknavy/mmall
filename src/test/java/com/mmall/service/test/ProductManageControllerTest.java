@@ -1,6 +1,7 @@
 package com.mmall.service.test;
 
-import com.mmall.controller.portal.UserController;
+import com.mmall.controller.backend.ProductManageController;
+import com.mmall.controller.portal.ProductController;
 import com.mmall.pojo.User;
 import com.mmall.service.impl.UserServiceImpl;
 import org.junit.Before;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TransactionConfiguration(transactionManager = "transactionManager")
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 //@SpringJUnitWebConfig(locations = "classpath:applicationContext.xml")
-public class UserControllerTest {
+public class ProductManageControllerTest {
 
     // test Controller
     private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -43,7 +44,8 @@ public class UserControllerTest {
     //private IUserService userService;
     //@InjectMocks //注入mock的controller
     @Autowired
-    private UserController userController;
+    //private ProductController productController;
+    private ProductManageController productManageController;
 
     //@Autowired //注入实现类
     //private UserServiceImpl userService;
@@ -58,19 +60,21 @@ public class UserControllerTest {
     @Before
     public void setUp() throws Exception{
         //MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(productManageController).build();
         //mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
+    private String url = "/manage/product/detail.do"; //detail.do,list.do,upload.do
+
     //https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#spring-mvc-test-framework
     @Test // test a controller
-    public void userControllerTest() throws Exception{
-        User user = createUser();
+    public void productControllerTest() throws Exception{
+        //User user = createUser();
         //ServerResponse x = userService.register(user);
         //logger.info(ToStringBuilder.reflectionToString(x.getMsg()));
         //this.mockMvc.perform(get("/user/register.do")
         //this.mockMvc.perform(MockMvcRequestBuilders.get("/user/register.do")
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/user/register.do", user)
+        this.mockMvc.perform(MockMvcRequestBuilders.get(url) //(url, Object...)无限量对象,如果mock HttpSession
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))

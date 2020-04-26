@@ -8,7 +8,6 @@ import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,7 +35,7 @@ public class CategoryManageController {
             HttpSession session, String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId){ //如果前端没有传入id,默认为0
         User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
         if(user == null){
-            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
         }
         if(userService.checkAdminRole(user).isSuccess()){
             //admin role, can maintain category
@@ -52,7 +51,7 @@ public class CategoryManageController {
     public ServerResponse setCategoryName(HttpSession session,Integer categoryId, String categoryName){
         User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
         if(user == null){
-            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
         }
         if(userService.checkAdminRole(user).isSuccess()){
             //admin role, can maintain category
@@ -69,7 +68,7 @@ public class CategoryManageController {
     public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
         User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
         if(user == null){
-            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
         }
         if(userService.checkAdminRole(user).isSuccess()){
             //admin role, can maintain category
@@ -87,7 +86,7 @@ public class CategoryManageController {
     public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
         User user = (User) session.getAttribute(Const.CURRENT_USER); // object 2 user
         if(user == null){
-            return ServerResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "need to login");
         }
         if(userService.checkAdminRole(user).isSuccess()){
             //admin role, can maintain category

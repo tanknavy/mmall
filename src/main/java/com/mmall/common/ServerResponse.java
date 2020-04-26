@@ -43,6 +43,7 @@ public class ServerResponse<T> implements Serializable {
         this.data = data;
     }
 
+
     @JsonIgnore // 公共方法，避免这个布尔字段出现在序列化中
     public boolean isSuccess(){
         return this.status == ResponseCode.SUCCESS.getCode(); // 枚举类，杜绝硬编码
@@ -81,11 +82,12 @@ public class ServerResponse<T> implements Serializable {
         return new ServerResponse<T>(ResponseCode.ERROR.getCode(), ResponseCode.ERROR.getDesc());
     }
 
+
     public static <T> ServerResponse<T> createByErrorMessage(String errorMessage){
         return new ServerResponse<T>(ResponseCode.ERROR.getCode(), errorMessage);
     }
 
-    public static <T> ServerResponse<T> createByErrorMessage(int errorCode, String errorMessage){
+    public static <T> ServerResponse<T> createByErrorCodeMessage(int errorCode, String errorMessage){
         return new ServerResponse<>(errorCode, errorMessage);
     }
 
