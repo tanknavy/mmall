@@ -151,7 +151,12 @@
     </if>
   </delete>
 
-
+  <update id="checkedOrUnCheckedAllProduct" parameterType="map">
+    UPDATE  mmall_cart
+    set checked = #{checked},
+    update_time = now()
+    where user_id = #{userId}
+  </update>
 
   <update id="checkedOrUncheckedProduct" parameterType="map">
     UPDATE  mmall_cart
@@ -163,7 +168,7 @@
     </if>
   </update>
 
-
+  <!--mySQL if sum null, default 0-->
   <select id="selectCartProductCount" parameterType="int" resultType="int">
     select IFNULL(sum(quantity),0) as count from mmall_cart where user_id = #{userId}
   </select>

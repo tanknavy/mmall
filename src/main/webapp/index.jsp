@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<h2>Hello World!</h2>
+<h2>e-commerce portal</h2>
     <!-- form:form action="${pageContext.request.contextPath}/authenticateTheUser" -->
 	<form name="login" action="/mmall/user/login.do" method="POST">
 		<p>
