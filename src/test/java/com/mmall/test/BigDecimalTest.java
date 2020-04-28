@@ -30,6 +30,16 @@ public class BigDecimalTest {
         BigDecimal b1 = new BigDecimal("0.05"); //使用string constructor方法
         BigDecimal b2 = new BigDecimal("0.01");
         System.out.println(b1.add(b2)); //结果更乱了
+    }
 
+    @Test
+    public void test4(){
+        String aliAmount = "33.95";
+        BigDecimal internalAmount = new BigDecimal("33.95");
+        System.out.println(internalAmount);
+
+        BigDecimal aliAmount_decimal = new BigDecimal(aliAmount);
+
+        System.out.println(aliAmount_decimal.doubleValue() ==  internalAmount.doubleValue());
     }
 }

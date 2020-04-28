@@ -42,4 +42,5 @@ public class BigDecimalUtil {
         // 除不净的情况，采用某个策略
         return b1.divide(b2,2,BigDecimal.ROUND_HALF_UP); //保留两位小数，四舍五入！
     }
+
 }

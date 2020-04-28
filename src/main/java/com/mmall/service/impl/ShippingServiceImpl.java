@@ -2,7 +2,6 @@ package com.mmall.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.ShippingMapper;

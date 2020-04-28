@@ -28,6 +28,7 @@ public class PropertiesUtil {
         } catch (IOException e) {
             logger.error("配置文件读取异常",e);
         }
+
     }
 
     //工具类，静态方法
