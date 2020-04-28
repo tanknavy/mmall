@@ -8,6 +8,7 @@ import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
+import com.mmall.service.ICartService;
 import com.mmall.service.IOrderService;
 import com.mmall.util.PropertiesUtil;
 import org.slf4j.Logger;
@@ -36,7 +37,33 @@ public class OrderController {
 
     @Autowired
     private IOrderService iOrderService;
+    @Autowired
+    private ICartService iCartService;
 
+    // Order
+
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse create(HttpSession session, Integer shippingId){ //从购物车已勾选商品创建订单，用户会指定/创建shipping
+        User user = (User) session.getAttribute(Const.CURRENT_USER); //cast Object->User
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    // Order Payment
     // session用于用户登录判断，request用于拿到upload的文件路径，然后将QR传到FTP server，再返回给前端的二维码地址
     @RequestMapping("pay.do")
     @ResponseBody
