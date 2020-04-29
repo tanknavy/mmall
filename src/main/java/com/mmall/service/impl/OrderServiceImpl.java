@@ -37,10 +37,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Alex Cheng
@@ -385,6 +382,52 @@ public class OrderServiceImpl implements IOrderService {
         pageResult.setList(orderVoList);
 
         return ServerResponse.createBySuccess(pageResult);
+    }
+
+
+    public ServerResponse<OrderVo> manageDetail(Long orderNo){
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order != null){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
+            OrderVo orderVo = assembleOrderVo(order, orderItemList);
+            return ServerResponse.createBySuccess(orderVo);
+        }
+        return ServerResponse.createByErrorMessage("This order doesn't exist");
+    }
+
+    // backend order search, will by multi condition
+    public ServerResponse<PageInfo> manageSearch(Long orderNo, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order != null){
+            List<OrderItem>  orderItemList = orderItemMapper.getByOrderNo(orderNo);
+            OrderVo orderVo = assembleOrderVo(order, orderItemList);
+
+            PageInfo pageResult = new PageInfo(Lists.newArrayList(order));//分页信息一样
+            pageResult.setList(Lists.newArrayList(orderVo));
+
+            return ServerResponse.createBySuccess(pageResult);
+        }
+
+        return ServerResponse.createByErrorMessage("This order doesn't exist");
+    }
+
+    //后台发货
+    public ServerResponse<String> manageSendGoods(Long orderNo){
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if(order != null){
+           if(order.getStatus() == Const.OrderStatusEnum.PAID.getCode()){
+               order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode()); //update this order
+               order.setSendTime(new Date());
+
+               orderMapper.updateByPrimaryKeySelective(order);
+
+               return ServerResponse.createBySuccessMessage("order shipping is success");
+           }
+
+        }
+        return ServerResponse.createByErrorMessage("This order doesn't exist");
     }
 
 
