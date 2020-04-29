@@ -10,6 +10,8 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mmall.common.Const;
@@ -22,6 +24,7 @@ import com.mmall.util.DateTimeUtil;
 import com.mmall.util.FTPUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.OrderItemVo;
+import com.mmall.vo.OrderProductVo;
 import com.mmall.vo.OrderVo;
 import com.mmall.vo.ShippingVo;
 import org.apache.commons.collections.CollectionUtils;
@@ -106,7 +109,7 @@ public class OrderServiceImpl implements IOrderService {
         orderItemMapper.batchInsert(orderItemList); // insert orderItem into DB
 
         // order&orderItem are created, reduce stock and empty shopping cart
-        // 减少库存
+        // 创建好订单就减少库存？不等付款？
         this.reduceProductStock(orderItemList);
         // 清空购物车
         this.cleanCart(cartList);
@@ -275,7 +278,136 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    // payment
+    public ServerResponse<String> cancel(Integer userId, Long orderNo){
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
+        if(order == null){
+            return ServerResponse.createByErrorMessage("This order doesn't exist");
+        }
+        if(order.getStatus() != Const.OrderStatusEnum.NO_PAY.getCode()){
+            // 后续走退款流程
+            return ServerResponse.createByErrorMessage("already paid, cannot cancel this order");
+        }
+        Order updateOrder = new Order();
+        updateOrder.setId(order.getId());
+        updateOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode()); //更新订单转态，不回滚锁定的库存吗？
+
+        int row = orderMapper.updateByPrimaryKeySelective(updateOrder);
+        if(row > 0){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+
+    }
+
+    // for front-end page
+    public ServerResponse getOrderCartProduct(Integer userId){
+        OrderProductVo orderProductVo = new OrderProductVo();
+
+        List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
+        ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
+
+        if(!serverResponse.isSuccess()){
+            return serverResponse;
+        }
+        List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
+
+        //组装
+        List<OrderItemVo> orderItemVoList = Lists.newArrayList();
+        BigDecimal payment = new BigDecimal("0");
+        for(OrderItem orderItem:orderItemList){
+            payment = BigDecimalUtil.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+            orderItemVoList.add(assembleOrderItemVo(orderItem));
+        }
+
+        orderProductVo.setProductTotalPrice(payment);
+        orderProductVo.setOrderItemVoList(orderItemVoList);
+        orderProductVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+
+        return ServerResponse.createBySuccess(orderProductVo);
+
+    }
+
+
+    public ServerResponse<OrderVo> getOrderDetail(Integer userId, Long orderNo){
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
+        if(order != null){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo, userId);
+            //组装orderVo
+            OrderVo orderVo = assembleOrderVo(order, orderItemList);
+            return ServerResponse.createBySuccess(orderVo);
+        }
+
+        return ServerResponse.createByErrorMessage("This order doesn't exist");
+    }
+
+    public ServerResponse<PageInfo> getOrderList(Integer userId, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+
+        List<Order> orderList = orderMapper.selectByUserId(userId);
+        List<OrderVo> orderVoList = this.assembleOrderVoList(orderList, userId);
+
+        PageInfo pageResult = new PageInfo(orderList);
+        pageResult.setList(orderVoList);
+
+        return ServerResponse.createBySuccess(pageResult);
+
+    }
+
+
+    // query user order in PageHelper
+    private List<OrderVo> assembleOrderVoList(List<Order> orderList, Integer userId){
+
+        List<OrderVo> orderVoList = Lists.newArrayList();
+
+        for(Order order:orderList) {
+            List<OrderItem> orderItemList = Lists.newArrayList();
+            if (userId == null) { //为了Admin查询复用，如果是Admin这里userId == null
+                // admin can check every order
+                orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            } else {
+                orderItemList = orderItemMapper.getByOrderNoUserId(order.getOrderNo(), userId);
+            }
+            OrderVo orderVo = assembleOrderVo(order, orderItemList);
+            orderVoList.add(orderVo);
+        }
+        return  orderVoList;
+    }
+
+
+    // backend Admin order
+    public ServerResponse<PageInfo> manageList(int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+
+        List<Order> orderList = orderMapper.selectAllOrder();
+        List<OrderVo> orderVoList = this.assembleOrderVoList(orderList, null);//admin check all
+
+        PageInfo pageResult = new PageInfo(orderList);
+        pageResult.setList(orderVoList);
+
+        return ServerResponse.createBySuccess(pageResult);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // *****************************payment
+    // user alipay pre-create payment request, than wait for ali callback to confirm payment
     public ServerResponse pay(Long orderNo, Integer userId, String path) { //订单，用户，二维码存放路劲
         Map<String, String> resultMap = Maps.newHashMap();
         Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);

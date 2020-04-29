@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ public class OrderController {
     private ICartService iCartService;
 
     // Order
-
+    // create order,多次组装返回OrderVo
     @RequestMapping("create.do")
     @ResponseBody
     public ServerResponse create(HttpSession session, Integer shippingId){ //从购物车已勾选商品创建订单，用户会指定/创建shipping
@@ -52,6 +53,67 @@ public class OrderController {
 
         return iOrderService.createOrder(user.getId(), shippingId);
     }
+
+    //取消订单
+    // cancel order,多次组装返回OrderVo
+    @RequestMapping("cancel.do")
+    @ResponseBody
+    public ServerResponse cancel(HttpSession session, Long orderNo){ //未付款的订单取消
+        User user = (User) session.getAttribute(Const.CURRENT_USER); //cast Object->User
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+
+        return iOrderService.cancel(user.getId(), orderNo);
+    }
+
+
+
+    // 获取购物车中已经选中的产品详情
+    @RequestMapping("get_order_cart_product.do")
+    @ResponseBody
+    public ServerResponse getOrderCartProduct(HttpSession session, Long orderNo){ //未付款的订单取消
+        User user = (User) session.getAttribute(Const.CURRENT_USER); //cast Object->User
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+
+        return iOrderService.getOrderCartProduct(user.getId());
+    }
+
+
+    // 用户中心查看订单详情
+    @RequestMapping("detail.do")
+    @ResponseBody
+    public ServerResponse detail(HttpSession session, Long orderNo){ //未付款的订单取消
+        User user = (User) session.getAttribute(Const.CURRENT_USER); //cast Object->User
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+
+        return iOrderService.getOrderDetail(user.getId(),orderNo);
+    }
+
+
+    // 用户中心查看订单列表,需要分页
+    @RequestMapping("list.do")
+    @ResponseBody
+    public ServerResponse list(HttpSession session,
+                               @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){ //未付款的订单取消
+        User user = (User) session.getAttribute(Const.CURRENT_USER); //cast Object->User
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+
+        return iOrderService.getOrderList(user.getId(),pageNum,pageSize);
+    }
+
+
+
+
+
+
 
 
 
