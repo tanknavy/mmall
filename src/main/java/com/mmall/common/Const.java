@@ -87,6 +87,15 @@ public class Const {
         public void setCode(int code) {
             this.code = code;
         }
+
+        public static OrderStatusEnum codeOf(int code){
+            for(OrderStatusEnum orderStatusEnum: values()){
+                if(orderStatusEnum.getCode() == code){
+                    return orderStatusEnum;
+                }
+            }
+            throw new RuntimeException("Cannot find enum");
+        }
     }
 
     public interface AlipayCallback{
@@ -153,7 +162,18 @@ public class Const {
         public void setCode(int code) {
             this.code = code;
         }
+
+        public static PaymentTypeEnum codeOf(int code){ //根据code找对应枚举
+            for(PaymentTypeEnum paymentTypeEnum: values()){
+                if(paymentTypeEnum.getCode() == code){
+                    return paymentTypeEnum;
+                }
+            }
+            throw new RuntimeException("No this enum");//如果一个code也没找到
+        }
     }
+
+
 
 
 }
