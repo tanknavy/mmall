@@ -255,12 +255,7 @@
             <version>2.9.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
+
 
         <!-- hibernate data validation -->
         <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
@@ -360,9 +355,11 @@
             </plugin>
 
             <!-- note maven的核心插件之-complier插件默认只支持编译Java 1.4，因此需要加上支持高版本jre的配置，在pom.xml里面加上 增加编译插件 -->
+            <!-- in order to include external jar file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.2</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -372,6 +369,22 @@
                     </compilerArguments>
                 </configuration>
             </plugin>
+
+            <!--include test class into jar during package -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
         </plugins>
 
 
