@@ -355,7 +355,7 @@
             </plugin>
 
             <!-- note maven的核心插件之-complier插件默认只支持编译Java 1.4，因此需要加上支持高版本jre的配置，在pom.xml里面加上 增加编译插件 -->
-            <!-- in order to include external jar file -->
+            <!-- in order to include external jar file,否则本地路径的jar包在打包时不会包含 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
